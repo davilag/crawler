@@ -1,28 +1,63 @@
 package page
 
 import (
+    "fmt"
     "github.com/davilag/crawler/utils"
     "golang.org/x/net/html"
     "net/http"
+    "sync"
 )
 
-type (
-    Page struct {
-        BaseUrl   string
-        OriginUrl string
-        Urls      []string
-    }
-)
-
-func (p *Page) RetrieveUrls() error {
-    return p.retrieveUrl()
+type PageInterface interface {
+    RetrieveUrls() error
 }
 
-func (p *Page) retrieveUrl() error {
+type Page struct {
+    BaseUrl   string
+    OriginUrl string
+    Urls      []string
+    UrlMap    sync.Map
+    Pages     []Page
+}
+
+func (p *Page) RetrieveUrls(o chan bool) {
+    done := make(chan bool)
+    go p.retrieveUrl(done)
+    <-done
+    doneChild := make(chan bool)
+    for _, url := range p.Urls {
+        v := utils.AppendPath(p.OriginUrl, p.BaseUrl, url)
+        if _, ok := p.UrlMap.LoadOrStore(v, true); !ok {
+            fmt.Println("We haven't checked this url yet")
+            fmt.Println(v)
+            var np Page
+            np.OriginUrl = p.OriginUrl
+            np.BaseUrl = v
+            np.UrlMap = p.UrlMap
+            p.Pages = append(p.Pages, np)
+            go np.RetrieveUrls(doneChild)
+        }
+    }
+    for range p.Pages {
+        <-doneChild
+    }
+    o <- true
+}
+
+func (p *Page) retrieveUrl(c chan bool) {
+    if p.OriginUrl == "" {
+        fmt.Println("We haven't received the origin url")
+        p.OriginUrl = p.BaseUrl
+    }
     var ls []string
+    fmt.Println("Retrieving")
+    fmt.Println(p.BaseUrl)
     r, e := http.Get(p.BaseUrl)
     if e != nil {
-        return e
+        fmt.Println("We have an error")
+        fmt.Println(e)
+        c <- false
+        return
     }
 
     defer r.Body.Close()
@@ -38,8 +73,9 @@ func (p *Page) retrieveUrl() error {
                 }
             }
         case html.ErrorToken:
+            fmt.Println(ls)
             p.Urls = ls
-            return nil
+            c <- true
         }
     }
 }

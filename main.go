@@ -1,8 +1,8 @@
 package main
 
 import (
-    "fmt"
     "github.com/davilag/crawler/page"
+    "sync"
 )
 
 func main() {
@@ -10,14 +10,11 @@ func main() {
 
     //We need a thread safe map here.
     var p page.Page
-    p.OriginUrl = or
-    p.BaseUrl = b
-    e := p.RetrieveUrls()
-
-    fmt.Println(p.Urls)
-    if e != nil {
-        panic(e)
-    }
+    var m sync.Map
+    p.BaseUrl = or
+    p.UrlMap = m
+    done := make(chan bool)
+    p.RetrieveUrls(done)
 
     // ls := getPageUrls(or, "")
     // for _, val := range ls {
