@@ -28,8 +28,7 @@ func (p *Page) RetrieveUrls(o chan bool) {
     for _, url := range p.Urls {
         v := utils.AppendPath(p.OriginUrl, p.BaseUrl, url)
         if _, ok := p.UrlMap.LoadOrStore(v, true); !ok {
-            fmt.Println("We haven't checked this url yet")
-            fmt.Println(v)
+            fmt.Println("We haven't checked this url yet: ", v)
             var np Page
             np.OriginUrl = p.OriginUrl
             np.BaseUrl = v
@@ -38,9 +37,7 @@ func (p *Page) RetrieveUrls(o chan bool) {
             go np.RetrieveUrls(doneChild)
         }
     }
-    for range p.Pages {
-        <-doneChild
-    }
+    <-doneChild
     o <- true
 }
 
@@ -50,8 +47,7 @@ func (p *Page) retrieveUrl(c chan bool) {
         p.OriginUrl = p.BaseUrl
     }
     var ls []string
-    fmt.Println("Retrieving")
-    fmt.Println(p.BaseUrl)
+    fmt.Println("Retrieving ", p.BaseUrl)
     r, e := http.Get(p.BaseUrl)
     if e != nil {
         fmt.Println("We have an error")
@@ -76,6 +72,7 @@ func (p *Page) retrieveUrl(c chan bool) {
             fmt.Println(ls)
             p.Urls = ls
             c <- true
+            return
         }
     }
 }
