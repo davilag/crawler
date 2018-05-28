@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: Get dependencies
-          command: glide update
+          command: go get -t -d -v ./...
       - run:
           name: Run tests & benchmarks
           command: go test -v ./... -bench=.
