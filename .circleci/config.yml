@@ -1,12 +1,14 @@
 version: 2
 jobs:
   test:
+    docker:
+      - image: circleci/golang
     working_directory: /go/src/github.com/davilag/crawler
     steps:
       - checkout
       - run:
           name: Get dependencies
-          command: go get -t -d -v ./...
+          command: glide update
       - run:
           name: Run tests & benchmarks
           command: go test -v ./... -bench=.
