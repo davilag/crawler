@@ -3,7 +3,7 @@
 Command to crawl given an URL. 
 
 
-##Run command
+## Run command
 To run the command, you first need to build the project running `go build`. After the `crawler` binary is generated, execute:
 ```
 ./crawler http://example.org
