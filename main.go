@@ -18,7 +18,7 @@ func main() {
     }
 
     var s scanner.ScannerImp
-    urls := scanner.Scan(s, args[0]g)
+    urls := scanner.Scan(s, args[0])
     end := time.Now()
 
     fmt.Println("It has taken: ", end.Sub(start))

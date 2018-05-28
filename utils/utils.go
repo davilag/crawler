@@ -57,6 +57,14 @@ func ScanLinks(r io.Reader) (ls []string) {
                     ls = append(ls, val)
                 }
             }
+        case html.SelfClosingTagToken:
+            t := tn.Token()
+            if t.Data == "a" {
+                val, ok := GetHref(t)
+                if ok && IsValidURL(val) {
+                    ls = append(ls, val)
+                }
+            }
         case html.ErrorToken:
             return ls
         }
