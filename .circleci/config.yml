@@ -1,14 +1,12 @@
 version: 2
 jobs:
   test:
-    docker:
-      - image: instrumentisto/glide:latest
     working_directory: /go/src/github.com/davilag/crawler
     steps:
       - checkout
       - run:
           name: Get dependencies
-          command: glide update
+          command: go get -t -d -v ./...
       - run:
           name: Run tests & benchmarks
           command: go test -v ./... -bench=.
