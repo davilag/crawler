@@ -1,10 +1,10 @@
-package utils_test
+package main
 
 import (
+    "reflect"
     "strings"
     "testing"
 
-    "github.com/davilag/crawler/utils"
     "github.com/stretchr/testify/assert"
     "golang.org/x/net/html"
 )
@@ -65,7 +65,7 @@ func TestUtils_GetHref(t *testing.T) {
     }
 
     for _, s := range scenarios {
-        ref, succ := utils.GetHref(s.Token)
+        ref, succ := GetHref(s.Token)
         assert.Equal(t, s.ExpectedSuccess, succ)
         assert.Equal(t, s.ExpectedRef, ref)
     }
@@ -99,7 +99,7 @@ func TestUtils_AppendPath(t *testing.T) {
     }
 
     for _, s := range scenarios {
-        result := utils.AppendPath(s.Origin, s.Base, s.Path)
+        result := AppendPath(s.Origin, s.Base, s.Path)
         assert.Equal(t, s.Expected, result)
 
     }
@@ -134,7 +134,7 @@ func TestUtils_IsValidURL(t *testing.T) {
     }
 
     for _, s := range scenarios {
-        result := utils.IsValidURL(s.Url)
+        result := IsValidURL(s.Url)
         assert.Equal(t, s.Expected, result)
 
     }
@@ -167,12 +167,12 @@ func TestUtils_ScanLinks(t *testing.T) {
                      <a href="#link2"></a>
                      <a href="https://test.com"></a>
                    <html/>`,
-            Links: []string{},
+            Links: nil,
         },
     }
 
     for _, s := range scenarios {
-        links := utils.ScanLinks(strings.NewReader(s.Html))
-        assert.Equal(t, len(s.Links), len(links))
+        links := ScanLinks(strings.NewReader(s.Html))
+        assert.Equal(t, true, reflect.DeepEqual(links, s.Links))
     }
 }

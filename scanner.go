@@ -1,10 +1,6 @@
-package scanner
+package main
 
-import (
-    "net/http"
-
-    "github.com/davilag/crawler/utils"
-)
+import "net/http"
 
 type Scanner interface {
     FetchLinks(u string, o chan map[string][]string)
@@ -34,7 +30,7 @@ func fetchPage(u string) (ls []string, er error) {
     }
 
     defer r.Body.Close()
-    ls = utils.ScanLinks(r.Body)
+    ls = ScanLinks(r.Body)
     return ls, nil
 }
 
@@ -58,7 +54,7 @@ func Scan(s Scanner, or string) (urls map[string][]string) {
             processed[k] = true
             delete(processing, k)
             for _, u := range v {
-                url := utils.AppendPath(or, k, u)
+                url := AppendPath(or, k, u)
 
                 //If we have processed the url or we are processing it,
                 //we don't want to fetch it again
