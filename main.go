@@ -3,24 +3,22 @@ package main
 import (
     "fmt"
     "os"
-    "time"
 
     "github.com/davilag/crawler/scanner"
+    "github.com/davilag/crawler/utils"
 )
 
 func main() {
-    start := time.Now()
 
     args := os.Args[1:]
 
     if len(args) != 1 {
         panic("We need just 1 parameter, the origin url")
     }
-
+    or := args[0]
     var s scanner.ScannerImp
-    urls := scanner.Scan(s, args[0])
-    end := time.Now()
+    fmt.Println("Scanning url...")
+    urls := scanner.Scan(s, or)
 
-    fmt.Println("It has taken: ", end.Sub(start))
-    fmt.Println("Urls processed: ", len(urls))
+    utils.PrintTree(urls, or)
 }

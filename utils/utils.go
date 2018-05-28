@@ -1,13 +1,15 @@
 package utils
 
 import (
+    "fmt"
+    "golang.org/x/net/html"
     "io"
     "log"
     "net/url"
     "path"
     "strings"
 
-    "golang.org/x/net/html"
+    "github.com/disiqueira/gotree"
 )
 
 //Given an html.Token, returns an string the value of the href attribute of the token
@@ -63,4 +65,39 @@ func ScanLinks(r io.Reader) (ls []string) {
             return ls
         }
     }
+}
+
+//Given an url and a tree node, it generates entries to generate a full tree of that url
+func generateNode(url string, tree gotree.Tree, urls map[string][]string, or string, printed map[string]bool) {
+    urlList := urls[url]
+    urlsToPrint := map[string]gotree.Tree{}
+
+    //Doing this separation we prevent trees to be printed in their first occurrence vertically so
+    //they are going to be printed in their first occurrence horizontally.
+    //Example:
+    //We have in the page https://test.com/example/example2 a reference to https://test.com/about
+    //Instead of printing the /about tree under /example/example2, we are going to print it in the
+    //first level of the tree.
+    for _, u := range urlList {
+        uNode := tree.Add(u)
+        urlBase := AppendPath(or, url, u)
+        if !printed[urlBase] {
+            printed[urlBase] = true
+            urlsToPrint[urlBase] = uNode
+        }
+    }
+
+    for k, v := range urlsToPrint {
+        generateNode(k, v, urls, or, printed)
+    }
+}
+
+//Given a map from url to list of links in those urls and an origin
+//it generates a full tree of the site.
+func PrintTree(urls map[string][]string, or string) {
+    origin := gotree.New(or)
+    printed := map[string]bool{or: true}
+    generateNode(or, origin, urls, or, printed)
+
+    fmt.Println(origin.Print())
 }
