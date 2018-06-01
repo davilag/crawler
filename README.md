@@ -1,4 +1,4 @@
-# WeatherBot
+# Crawler
 [![CircleCI](https://circleci.com/gh/davilag/crawler/tree/master.svg?style=svg)](https://circleci.com/gh/davilag/crawler/tree/master)
 Command to crawl given an URL. 
 
