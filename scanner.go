@@ -18,7 +18,7 @@ func (s ScannerImp) FetchLinks(u string, o chan map[string][]string) {
 	ls, e := fetchPage(u)
 	if e != nil {
 		fmt.Println("Error retrieving url: ", u)
-		fmt.Println(e.Error)
+		fmt.Println(e)
 	}
 	m := make(map[string][]string)
 	m[u] = ls
